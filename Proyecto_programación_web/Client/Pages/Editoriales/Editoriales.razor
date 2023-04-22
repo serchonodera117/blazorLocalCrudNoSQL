@@ -1,0 +1,107 @@
+﻿@page "/editorialIndex"
+@inject HttpClient http
+@inject NavigationManager navegar
+
+<!--Sergio García Michel-->
+
+<h3>Listado de Editoriales</h3>
+
+<button class="btn btn-primary" @onclick="Nuevo">Agregar Editorial</button>
+
+@if (misEditoriales != null)
+{
+    <div>
+        <!--Tabla -->
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Editorial</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Editorial editTemp in misEditoriales)
+                {
+                    <tr>
+                        <td>@editTemp.NombreManga</td>
+                        <td>
+                            <button class="btn btn-sm" @onclick="() => { Editar(editTemp.Id); }"><span class="oi oi-pencil" /></button>
+                            <button class="btn btn-sm" @onclick="() => { preguntaEliminar(editTemp.Id); }"><span class="oi oi-trash" /></button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+}
+@if (preguntar)
+{
+    <div class="modal" tabindex="-1" style="display:block;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"> Advertencia</h5>
+                    <button type="button" class="btn btn-close" data-bs-dismiss="modal" @onclick="() => { preguntar = false; }" aria-label="Close">X</button>
+                </div>
+                <div class="modal-body">
+                    <h6>La editorial se eliminará de forma permanente</h6>
+                    <h6>¿Estás seguro que quieres eliminarla?</h6>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="Cancelar">Ahora no joven</button>
+                    <button type="button" class="btn btn-danger" @onclick="Borrar">Sis</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+@code {
+    private List<Editorial> misEditoriales;
+    bool preguntar = false;
+    int idBorrar;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Cargar();
+    }
+
+    private async Task Cargar()
+    {
+        misEditoriales = await http.GetFromJsonAsync<List<Editorial>>("api/editoriales");
+    }
+
+
+    private void Nuevo()
+    {
+        navegar.NavigateTo("editorialIndex/Crear");
+    }
+
+
+    private void Editar(int id)
+    {
+        navegar.NavigateTo($"editorialIndex/Editar/{id}");
+    }
+    private void preguntaEliminar(int id)
+    {
+        preguntar = true;
+        idBorrar = id;
+    }
+
+    public async Task Borrar()
+    {
+        await http.DeleteAsync($"api/editoriales/{idBorrar}");
+        await Cancelar();
+        await Cargar();
+
+    }
+    private async Task Cancelar()
+    {
+        idBorrar = 0;
+        preguntar = false;
+        await Cargar();
+    }
+}

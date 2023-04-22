@@ -1,0 +1,42 @@
+﻿@page "/editorialIndex/Editar/{Id:int}"
+@inject HttpClient http
+@inject NavigationManager navegar
+
+    <!--Sergio García Michel-->
+
+    <h3>Editar editorial</h3>
+    @if (miEditorial != null)
+    {
+        <EditForm Model="@miEditorial" OnValidSubmit="Modificar">
+            <DataAnnotationsValidator />
+            <div class="col-md-6">
+                <InputText type="text" @bind-Value="miEditorial.NombreManga" class="form-control"></InputText>
+                <ValidationMessage For="()=>miEditorial.NombreManga" />
+            </div>
+            <div class="row">
+                <div class="col">
+                    <button type="submit" class="btn btn-success">Modificar</button>
+                </div>
+            </div>
+        </EditForm>
+    }
+
+    @code {
+        Editorial miEditorial = new Editorial();
+
+        [Parameter]
+        public int Id { get; set; }
+
+        protected override async Task OnInitializedAsync()
+        {
+            miEditorial = await http.GetFromJsonAsync<Editorial>($"/api/editoriales/{Id}");
+        }
+
+        private async Task Modificar()
+        {
+            await http.PutAsJsonAsync($"api/editoriales/{miEditorial.Id}", miEditorial);
+            navegar.NavigateTo("editorialIndex");
+        }
+
+
+    }

@@ -1,0 +1,110 @@
+﻿@page "/mangaIndex"
+@inject HttpClient http
+@inject NavigationManager navegar
+
+<!--Sergio García Michel-->
+
+
+<h3>Mangas</h3>
+<button class="btn btn-primary" @onclick="Nuevo">Agregar Manga</button>
+
+@if (misMangas != null)
+{
+    <div>
+        <!--Tabla -->
+        <table class="table table-striped">
+            <thead>
+                <tr>
+
+                    <th>Descripcion</th>
+                    <th>Publicaciones</th>
+                    <th>Editorial</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Manga manga in misMangas)
+                {
+                    <tr>
+                      
+                        <td>@manga.Descripcion</td>
+                        <td>@manga.Publicaciones</td>
+                        <td>@manga.Editorial.NombreManga</td>
+                        <td>
+                            <button class="btn btn-sm" @onclick="() => { Editar(manga.Id); }"><span class="oi oi-pencil" /></button>
+                            <button class="btn btn-sm" @onclick="() => { preguntarEliminar(manga.Id); }"><span class="oi oi-trash" /></button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+}
+@if (mostrarModal)
+{
+    <div class="modal" tabindex="-1" style="display:block;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"> Advertencia</h5>
+                    <button type="button" class="btn btn-close" data-bs-dismiss="modal" @onclick="() => { mostrarModal = false; }" aria-label="Close">X</button>
+                </div>
+                <div class="modal-body">
+                    <h6>EL manga se eliminará de forma permanente</h6>
+                    <h6>¿Estás seguro que quieres eliminarla?</h6>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="Cancelar">Ahora no joven</button>
+                    <button type="button" class="btn btn-danger" @onclick="Borrar">Sis</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    List<Manga> misMangas = new List<Manga>();
+    bool mostrarModal = false;
+    int borrarId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Cargar();
+    }
+
+    private async Task Cargar()
+    {
+        misMangas = await http.GetFromJsonAsync<List<Manga>>("api/mangas");
+    }
+
+
+    private void Nuevo()
+    {
+        navegar.NavigateTo("mangaIndex/AgregarManga");
+    }
+
+    private void preguntarEliminar(int id)
+    {
+        borrarId = id;
+        mostrarModal = true;
+    }
+    private async Task Cancelar()
+    {
+        borrarId = 0;
+        mostrarModal = false;
+        await Cargar();
+    }
+
+
+    private async Task Borrar()
+    {
+        await http.DeleteAsync($"api/mangas/{borrarId}");
+        await Cancelar();
+        await Cargar();
+    }
+    private void Editar(int id)
+    {
+        navegar.NavigateTo($"mangaIndex/EditarManga/{id}");
+    }
+}

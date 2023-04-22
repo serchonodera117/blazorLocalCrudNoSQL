@@ -1,0 +1,53 @@
+﻿@page "/mangaIndex/EditarManga/{Id:int}"
+@inject HttpClient http
+@inject NavigationManager navegar
+<h3>Editar el manga</h3>
+<!--Sergio García Michel-->
+@if (myEditoriales != null && miManga != null)
+{
+    <EditForm Model="@miManga" OnValidSubmit="Modificar">
+        <DataAnnotationsValidator />
+        <div class="col-md-6">
+            <InputText type="text" @bind-Value="miManga.Descripcion" class="form-control"></InputText>
+            <ValidationMessage For="() => miManga.Descripcion" />
+        </div>
+        <br />
+        <div class="col-md-6">
+            <label> Publicaciones : </label>
+            <InputNumber @bind-Value="miManga.Publicaciones" class="form-control"></InputNumber>
+            <ValidationMessage For="()=>miManga.Publicaciones" />
+        </div>
+
+        <div class="form-group">
+            <label for="editorial">Editorial</label>
+            <InputSelectNumber class="form-control" @bind-Value="miManga.EditorialId" id="editorial">
+                @foreach (Editorial edit in myEditoriales)
+                    {
+                    <option value="@edit.Id">@edit.NombreManga</option>
+                    }
+            </InputSelectNumber>
+        </div>
+        <div class="col">
+            <button type="submit" class="btn btn-success">Editar</button>
+        </div>
+    </EditForm>
+}
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    Manga miManga;
+    private List<Editorial> myEditoriales = new List<Editorial>();
+
+    protected override async Task OnInitializedAsync()//obtener valores para la lista
+    {
+
+        myEditoriales = await http.GetFromJsonAsync<List<Editorial>>("api/editoriales");
+        miManga = await http.GetFromJsonAsync<Manga>($"api/mangas/{Id}");
+    }
+
+    private async Task Modificar()
+    {
+        await http.PutAsJsonAsync("api/mangas", miManga);
+        navegar.NavigateTo("mangaIndex");
+    }
+}

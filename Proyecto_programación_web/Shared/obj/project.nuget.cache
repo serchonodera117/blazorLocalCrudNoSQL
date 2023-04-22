@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "qGcvNuFXMzt6kO/FS9KOP9H/FJmeyMajHtlExAsg+2utJNBFHXmDdSyFWcxvU87L2Cq8c0XxfGm7x8YQvqWoWQ==",
+  "success": true,
+  "projectFilePath": "D:\\Facultad\\4_CUARTO_SEMESTRE\\Programación_Web\\Proyecto_programación_web\\Proyecto_programación_web\\Shared\\Proyecto_programación_web.Shared.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\sergi\\.nuget\\packages\\system.componentmodel.annotations\\5.0.0\\system.componentmodel.annotations.5.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}

@@ -1,0 +1,54 @@
+﻿@page "/mangaIndex/AgregarManga"
+@inject HttpClient http
+@inject NavigationManager navegar
+
+<!--Sergio García Michel-->
+
+<h3>Agregar Manga</h3>
+<EditForm Model="@miManga" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div class="col-md-6">
+        <InputText type="text" @bind-Value="miManga.Descripcion" class="form-control"></InputText>
+        <ValidationMessage For="()=>miManga.Descripcion" />
+    </div>
+
+    <br />
+    <div class="col-md-6">
+        <label> Publicaciones : </label>
+        <InputNumber @bind-Value="miManga.Publicaciones" class="form-control"></InputNumber>
+        <ValidationMessage For="()=>miManga.Publicaciones" />
+    </div>
+    <div class="form-group">
+        <label for="manga">Editorial</label>
+        <InputSelectNumber class="form-control" @bind-Value="miManga.EditorialId" id="manga">
+            @foreach (Editorial edit in myEditoriales)
+            {
+                <option value="@edit.Id">@edit.NombreManga</option>
+            }
+        </InputSelectNumber>
+    </div>
+
+
+    <div class="row">
+        <div class="col">
+            <button type="submit" class="btn btn-success">Guardar</button>
+        </div>
+    </div>
+</EditForm>
+
+    @code {
+        Manga miManga = new Manga();
+        private List<Editorial> myEditoriales = new List<Editorial>();
+
+        protected override async Task OnInitializedAsync()
+        {
+            myEditoriales = await http.GetFromJsonAsync<List<Editorial>>("api/editoriales");
+            miManga.EditorialId = myEditoriales[0].Id;
+        }
+
+        private async Task Guardar()
+        {
+            await http.PostAsJsonAsync("api/mangas", miManga);
+            navegar.NavigateTo("mangaIndex");
+        }
+    }

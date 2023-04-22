@@ -1,0 +1,27 @@
+﻿@page "/editorialIndex/Crear"
+@inject HttpClient http
+@inject NavigationManager navegar
+
+    <!--Sergio García Michel-->
+    <h3>Añadir editorial</h3>
+    <EditForm Model="@miEditorial" OnValidSubmit="Guardar">
+        <DataAnnotationsValidator />
+        <div class="col-md-6">
+            <InputText type="text" @bind-Value="miEditorial.NombreManga" class="form-control"></InputText>
+            <ValidationMessage For="()=>miEditorial.NombreManga" />
+        </div>
+        <div class="row">
+            <div class="col">
+                <button type="submit" class="btn btn-success">Guardar</button>
+            </div>
+        </div>
+    </EditForm>
+
+    @code {
+        private Editorial miEditorial = new Editorial();
+        private async Task Guardar()
+        {
+            await http.PostAsJsonAsync("api/editoriales", miEditorial);
+            navegar.NavigateTo("editorialIndex");
+        }
+    }
